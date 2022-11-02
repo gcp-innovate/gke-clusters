@@ -20,7 +20,7 @@
 # see: https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#grant_host_service_agent_role
 
 module "project-host" {
-  source          = "modules/project"
+  source          = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/project"
   parent          = var.root_node
   billing_account = var.billing_account_id
   prefix          = var.prefix
@@ -35,7 +35,7 @@ module "project-host" {
 }
 
 module "project-svc-gce" {
-  source          = "modules/project"
+  source          = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/project"
   parent          = var.root_node
   billing_account = var.billing_account_id
   prefix          = var.prefix
@@ -58,7 +58,7 @@ module "project-svc-gce" {
 # allows to fetch GKE credentials from bastion for clusters in this project
 
 module "project-svc-gke" {
-  source          = "modules/project"
+  source          = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/project"
   parent          = var.root_node
   billing_account = var.billing_account_id
   prefix          = var.prefix
@@ -92,7 +92,7 @@ module "project-svc-gke" {
 # subnet IAM bindings control which identities can use the individual subnets
 
 module "vpc-shared" {
-  source     = "modules/net-vpc"
+  source     = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/net-vpc"
   project_id = module.project-host.project_id
   name       = "shared-vpc"
   subnets = [
@@ -130,14 +130,14 @@ module "vpc-shared" {
 }
 
 module "vpc-shared-firewall" {
-  source       = "modules/net-vpc-firewall"
+  source       = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/net-vpc-firewall"
   project_id   = module.project-host.project_id
   network      = module.vpc-shared.name
   admin_ranges = values(var.ip_ranges)
 }
 
 module "nat" {
-  source         = "modules/net-cloudnat"
+  source         = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/net-cloudnat"
   project_id     = module.project-host.project_id
   region         = var.region
   name           = "vpc-shared"
@@ -150,7 +150,7 @@ module "nat" {
 ################################################################################
 
 module "host-dns" {
-  source          = "modules/dns"
+  source          = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/dns"
   project_id      = module.project-host.project_id
   type            = "private"
   name            = "example"
@@ -167,7 +167,7 @@ module "host-dns" {
 ################################################################################
 
 module "vm-bastion" {
-  source     = "modules/compute-vm"
+  source     = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/compute-vm"
   project_id = module.project-svc-gce.project_id
   zone       = "${var.region}-b"
   name       = "bastion"
@@ -195,7 +195,7 @@ module "vm-bastion" {
 ################################################################################
 
 module "cluster-1" {
-  source     = "modules/gke-cluster"
+  source     = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/gke-cluster"
   count      = var.cluster_create ? 1 : 0
   name       = "cluster-1"
   project_id = module.project-svc-gke.project_id
@@ -219,7 +219,7 @@ module "cluster-1" {
 }
 
 module "cluster-1-nodepool-1" {
-  source       = "modules/gke-nodepool"
+  source       = "git::https://github.com/gcp-innovate/gke-clusters.git/modules/gke-nodepool"
   count        = var.cluster_create ? 1 : 0
   name         = "nodepool-1"
   project_id   = module.project-svc-gke.project_id
