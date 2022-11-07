@@ -92,7 +92,7 @@ module "project-svc-gke" {
 # subnet IAM bindings control which identities can use the individual subnets
 
 module "vpc-shared" {
-  source     = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/net-vpc"
+  source     = "./modules/net-vpc"
   project_id = module.project-host.project_id
   name       = "shared-vpc"
   subnets = [
@@ -130,14 +130,14 @@ module "vpc-shared" {
 }
 
 module "vpc-shared-firewall" {
-  source       = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/net-vpc-firewall"
+  source       = "./modules/net-vpc-firewall"
   project_id   = module.project-host.project_id
   network      = module.vpc-shared.name
   admin_ranges = values(var.ip_ranges)
 }
 
 module "nat" {
-  source         = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/net-cloudnat"
+  source         = "./modules/net-cloudnat"
   project_id     = module.project-host.project_id
   region         = var.region
   name           = "vpc-shared"
@@ -150,7 +150,7 @@ module "nat" {
 ################################################################################
 
 module "host-dns" {
-  source          = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/dns"
+  source          = "./modules/dns"
   project_id      = module.project-host.project_id
   type            = "private"
   name            = "example"
@@ -167,7 +167,7 @@ module "host-dns" {
 ################################################################################
 
 module "vm-bastion" {
-  source     = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/compute-vm"
+  source     = "./modules/compute-vm"
   project_id = module.project-svc-gce.project_id
   zone       = "${var.region}-b"
   name       = "bastion"
@@ -195,7 +195,7 @@ module "vm-bastion" {
 ################################################################################
 
 module "cluster-1" {
-  source     = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/gke-cluster"
+  source     = "./modules/gke-cluster"
   count      = var.cluster_create ? 1 : 0
   name       = "cluster-1"
   project_id = module.project-svc-gke.project_id
@@ -219,7 +219,7 @@ module "cluster-1" {
 }
 
 module "cluster-1-nodepool-1" {
-  source       = "git:gcp-innovate@github.com/gcp-innovate/gke-clusters.git/modules/gke-nodepool"
+  source       = "./modules/gke-nodepool"
   count        = var.cluster_create ? 1 : 0
   name         = "nodepool-1"
   project_id   = module.project-svc-gke.project_id
