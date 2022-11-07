@@ -20,7 +20,7 @@
 # see: https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#grant_host_service_agent_role
 
 module "project-host" {
-  source          = "https://github.com/gcp-innovate/gke-clusters/tree/main/modules/project"
+  source          = "https://github.com/gcp-innovate/gke-clusters.git/modules/project"
   parent          = var.root_node
   billing_account = var.billing_account_id
   prefix          = var.prefix
